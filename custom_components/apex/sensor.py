@@ -7,12 +7,12 @@ from homeassistant.components.sensor import (
 )
 
 from . import ApexEntity
-from .const import DOMAIN, SENSORS, MEASUREMENTS, MANUAL_SENSORS
+from .const import DOMAIN, MANUAL_SENSORS, MEASUREMENTS, SENSORS
 
 _LOGGER = logging.getLogger(__name__)
 
-async def async_setup_entry(hass, config_entry, async_add_entities):
 
+async def async_setup_entry(hass, config_entry, async_add_entities):
     # _LOGGER.debug("Current configuration: %s", hass.config.as_dict())
 
     """Get System Temperature Unit"""
@@ -27,10 +27,17 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
         sensor = ApexSensor(entry, value, config_entry.options)
         async_add_entities([sensor], True)
     for value in entry.data["outputs"]:
-        if value["type"] in ("dos", "variable", "virtual", "vortech", "iotaPump|Sicce|Syncra"):
+        if value["type"] in (
+            "dos",
+            "variable",
+            "virtual",
+            "vortech",
+            "iotaPump|Sicce|Syncra",
+            "cor|15",
+            "cor|20",
+        ):
             sensor = ApexSensor(entry, value, config_entry.options)
             async_add_entities([sensor], True)
-            
 
     """Add Feed Status Remaining Time"""
     for value in MANUAL_SENSORS:
@@ -63,18 +70,19 @@ class ApexSensor(ApexEntity, SensorEntity):
                         apex_type = self.coordinator.data["feed"]["apex_type"]
 
                     # Apex Classic does feed with 6 as OFF and 1-4 as ON
-                    if apex_type == 'old':
-
-                        _LOGGER.debug(f"get_value[state:feed]: old_data|{self.coordinator.data["feed"]}")
+                    if apex_type == "old":
+                        _LOGGER.debug(
+                            f"get_value[state:feed]: old_data|{self.coordinator.data['feed']}"
+                        )
 
                         name = self.coordinator.data["feed"]["name"]
                         if name == 6:
-                            return 0        # feed is off
+                            return 0  # feed is off
                         else:
                             feed_value = self.coordinator.data["feed"]["active"]
                             hour = feed_value
                             show_hour = 0
-                            if ( feed_value > 3600 ):
+                            if feed_value > 3600:
                                 show_hour = 1
                                 hour = feed_value / 60
                             total_minutes = hour / 60
@@ -87,7 +95,10 @@ class ApexSensor(ApexEntity, SensorEntity):
                             return time
 
                 # Handle "feed" if not Apex Classic
-                if "feed" in self.coordinator.data and "active" in self.coordinator.data["feed"]:
+                if (
+                    "feed" in self.coordinator.data
+                    and "active" in self.coordinator.data["feed"]
+                ):
                     if self.coordinator.data["feed"]["active"] > 50000:
                         return 0
                     else:
@@ -104,8 +115,13 @@ class ApexSensor(ApexEntity, SensorEntity):
                     if self.sensor["type"] == "iotaPump|Sicce|Syncra":
                         return value["status"][1]
                     if self.sensor["type"] == "vortech":
-                        return f"{value["status"][0]} {value["status"][1]} {value["status"][2]}"
-                    if self.sensor["type"] == "virtual" or self.sensor["type"] == "variable":
+                        return f"{value['status'][0]} {value['status'][1]} {value['status'][2]}"
+                    if (
+                        self.sensor["type"] == "virtual"
+                        or self.sensor["type"] == "variable"
+                        or self.sensor["type"] == "cor|15"
+                        or self.sensor["type"] == "cor|20"
+                    ):
                         if "config" in self.coordinator.data:
                             config_data = self.coordinator.data["config"]
                             if "oconf" in config_data:
@@ -120,7 +136,7 @@ class ApexSensor(ApexEntity, SensorEntity):
                                     # _LOGGER.debug(f"get_value[state:variable]: {self.sensor|value}")
                                     if "intensity" in value:
                                         return value["intensity"]
-                    
+
         if ftype == "attributes":
             for value in self.coordinator.data["inputs"]:
                 if value["did"] == self.sensor["did"]:
@@ -131,7 +147,12 @@ class ApexSensor(ApexEntity, SensorEntity):
                         return value
                     if self.sensor["type"] == "iotaPump|Sicce|Syncra":
                         return value
-                    if self.sensor["type"] == "virtual" or self.sensor["type"] == "variable":
+                    if (
+                        self.sensor["type"] == "virtual"
+                        or self.sensor["type"] == "variable"
+                        or self.sensor["type"] == "cor|15"
+                        or self.sensor["type"] == "cor|20"
+                    ):
                         if "config" in self.coordinator.data:
                             config_data = self.coordinator.data["config"]
                             if "oconf" in config_data:
@@ -142,7 +163,7 @@ class ApexSensor(ApexEntity, SensorEntity):
                                 return value
                         else:
                             return value
-    
+
     def process_prog(self, prog):
         if len(prog) > 255:
             return None
@@ -153,8 +174,8 @@ class ApexSensor(ApexEntity, SensorEntity):
             _LOGGER.debug(test[0])
             return int(test[0])
         else:
-            return prog     
-    
+            return prog
+
     @property
     def name(self):
         return "apex_" + self.sensor["name"]
