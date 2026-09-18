@@ -1,4 +1,7 @@
 ## **Changelog**
+## Version 1.17
+- Added support for COR15 and COR20 pumps (Thanks @rsumner) 
+- Removed config_entry from config_flow to prevent 500 errors (Thanks @rsumner)
 ## Version 1.16
 - Remove deprecated async method and add long term statistic support(Thanks @mattrcampbell) 
 ## Version 1.15
