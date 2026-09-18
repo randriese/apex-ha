@@ -1,4 +1,5 @@
 """Config flow for Apex integration."""
+
 import logging
 
 import voluptuous as vol
@@ -6,13 +7,13 @@ from homeassistant import config_entries, core, exceptions
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
 from homeassistant.core import callback
 
-from .const import (  # pylint:disable=unused-import
-    DOMAIN, 
-    DEVICEIP,
-    UPDATE_INTERVAL, 
-    UPDATE_INTERVAL_DEFAULT
-)
 from .apex import Apex
+from .const import (  # pylint:disable=unused-import
+    DEVICEIP,
+    DOMAIN,
+    UPDATE_INTERVAL,
+    UPDATE_INTERVAL_DEFAULT,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -30,7 +31,7 @@ async def validate_input(hass: core.HomeAssistant, data):
 
     Data has the keys from DATA_SCHEMA with values provided by the user.
     """
-    
+
     apex = Apex(data[CONF_USERNAME], data[CONF_PASSWORD], data[DEVICEIP])
 
     try:
@@ -84,7 +85,6 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 class OptionsFlow(config_entries.OptionsFlow):
     def __init__(self, config_entry: config_entries.ConfigEntry):
         """Initialize options flow."""
-        self.config_entry = config_entry
 
     async def async_step_init(self, user_input=None):
         if user_input is not None:
