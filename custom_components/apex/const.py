@@ -31,6 +31,7 @@ SENSORS = {
     "Temp": {"icon": "mdi:water-thermometer", "measurement": "°C"},
     "Cond": {"icon": "mdi:shaker-outline", "measurement": "ppt"},
     "in": {"icon": "mdi:ruler", "measurement": "in"},
+    "LLS": {"icon": "mdi:ruler", "measurement": "in"},
     "pH": {"icon": "mdi:test-tube", "measurement": " "},
     "ORP": {"icon": "mdi:test-tube", "measurement": "mV"},
     "digital": {"icon": "mdi:digital-ocean"},
@@ -49,6 +50,8 @@ SENSORS = {
     "feed" : {"icon": "mdi:timer", "measurement": "mins"},
     "gph" : {"icon": "mdi:waves-arrow-right", "measurement": "gph"},
     "vortech" : {"icon": "mdi:pump"},
+    "MXMLight|Ecotech|15G6P": {"icon": "mdi:led-strip", "measurement": "%"},
+    "MXMLight|Ecotech|15G6PL": {"icon": "mdi:led-strip", "measurement": "%"},
     "UNK" : {"icon": "mdi:help"}
 }
 
